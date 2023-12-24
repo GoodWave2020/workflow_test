@@ -1,10 +1,13 @@
-name: Pull Request Workflow
+name: プルリク時自動整形
 
 on:
   pull_request:
     types:
       - opened
       - synchronize
+
+permissions:
+  contents: write
 
 jobs:
   format-and-commit:
@@ -13,9 +16,11 @@ jobs:
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v4
+      with:
+        ref: ${{ github.event.pull_request.head.ref }}
 
     - name: Set up Go
-      uses: actions/setup-go@v2
+      uses: actions/setup-go@v4
       with:
         go-version: 1.19.4
 
@@ -27,11 +32,11 @@ jobs:
 
     - name: Commit Changes
       run: |
-        git checkout ${{ github.head_ref }}
-        git branch
-        git show --format='%h' --no-patch
-        git config user.name "${{ github.actor }}"
-        git config user.email "${{ github.actor }}@users.noreply.github.com"
-        git add .
-        git commit -m "Format code using gofumpt"
-        git push
+        if ! git diff --exit-code --quiet
+        then
+          git config user.name GitHub Action
+          git config user.email action@github.com
+          git add .
+          git commit -m "Format code using gofumpt"
+          git push
+        fi
