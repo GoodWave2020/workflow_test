@@ -7,13 +7,31 @@ on:
       - synchronize
 
 jobs:
-  build:
+  format-and-commit:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout Repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
-    - name: Run Your Workflow Steps
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.19.4
+
+    - name: Install gofumpt
+      run: go install mvdan.cc/gofumpt@latest
+
+    - name: Format Code
+      run: gofumpt -l -w -extra .
+
+    - name: Commit Changes
       run: |
-        echo test
+        git checkout ${{ github.head_ref }}
+        git branch
+        git show --format='%h' --no-patch
+        git config user.name "${{ github.actor }}"
+        git config user.email "${{ github.actor }}@users.noreply.github.com"
+        git add .
+        git commit -m "Format code using gofumpt"
+        git push
