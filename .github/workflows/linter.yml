@@ -27,6 +27,7 @@ jobs:
 
     - name: Commit Changes
       run: |
+        cat main.go
         git show --format='%h' --no-patch
         git config user.name "${{ github.actor }}"
         git config user.email "${{ github.actor }}@users.noreply.github.com"
