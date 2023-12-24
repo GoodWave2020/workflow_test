@@ -27,10 +27,9 @@ jobs:
 
     - name: Commit Changes
       run: |
-        cat main.go
         git show --format='%h' --no-patch
         git config user.name "${{ github.actor }}"
         git config user.email "${{ github.actor }}@users.noreply.github.com"
         git add .
         git commit -m "Format code using gofumpt"
-        git push
+        git push origin HEAD:${{ github.head_ref }}
