@@ -27,6 +27,7 @@ jobs:
 
     - name: Commit Changes
       run: |
+        git chechout ${{ github.head_ref }}
         git branch
         git show --format='%h' --no-patch
         git config user.name "${{ github.actor }}"
