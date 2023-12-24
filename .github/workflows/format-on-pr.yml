@@ -1,4 +1,4 @@
-name: Pull Request Workflow
+name: プルリク時自動整形
 
 on:
   pull_request:
