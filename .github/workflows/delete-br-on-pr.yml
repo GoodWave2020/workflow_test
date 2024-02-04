@@ -1,13 +1,18 @@
-name: Delete Merged Branch
+name: マージ後ブランチ自動削除
 
 on:
   pull_request:
     types:
       - closed
 
+permissions:
+    contents: write
+
 jobs:
-  deleteMergedBranch:
+  delete-merged-branch:
     runs-on: ubuntu-latest
+    env:
+        BASE_BRANCH: "main"
 
     steps:
     - name: Check out the code
@@ -15,7 +20,7 @@ jobs:
 
     - name: Delete Merged Branch
       run: |
-        if [ "${{ github.event_name }}" == "pull_request" ] && [ "${{ github.event.action }}" == "closed" ] && [ "${{ github.event.pull_request.merged }}" == "true" ] && [ "${{ github.event.pull_request.base.ref }}" == "main" ]; then
+        if [ "${{ github.event_name }}" == "pull_request" ] && [ "${{ github.event.action }}" == "closed" ] && [ "${{ github.event.pull_request.merged }}" == "true" ] && [ "${{ github.event.pull_request.base.ref }}" == "$BASE_BRANCH" ]; then
           mergedBranchName=$(echo "${{ github.event.pull_request.head.ref }}" | tr -d '\n')
           git push origin --delete "$mergedBranchName"
           echo "Merged branch '$mergedBranchName' deleted."
