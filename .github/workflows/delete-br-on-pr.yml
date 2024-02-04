@@ -1,0 +1,24 @@
+name: Delete Merged Branch
+
+on:
+  pull_request:
+    types:
+      - closed
+
+jobs:
+  deleteMergedBranch:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out the code
+      uses: actions/checkout@v2
+
+    - name: Delete Merged Branch
+      run: |
+        if [ "${{ github.event_name }}" == "pull_request" ] && [ "${{ github.event.action }}" == "closed" ] && [ "${{ github.event.pull_request.merged }}" == "true" ] && [ "${{ github.event.pull_request.base.ref }}" == "main" ]; then
+          mergedBranchName=$(echo "${{ github.event.pull_request.head.ref }}" | tr -d '\n')
+          git push origin --delete "$mergedBranchName"
+          echo "Merged branch '$mergedBranchName' deleted."
+        else
+          echo "Not a merged pull request to the main branch. Skipping."
+        fi
