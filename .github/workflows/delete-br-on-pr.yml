@@ -12,7 +12,8 @@ jobs:
   delete-merged-branch:
     runs-on: ubuntu-latest
     env:
-        BASE_BRANCH: "main"
+        # マージ後も削除しないブランチをスペース区切りで指定する
+        SKIP_BRANCHES: "develop anydoc/update"
 
     steps:
     - name: Check out the code
@@ -20,10 +21,10 @@ jobs:
 
     - name: Delete Merged Branch
       run: |
-        if [ "${{ github.event_name }}" == "pull_request" ] && [ "${{ github.event.action }}" == "closed" ] && [ "${{ github.event.pull_request.merged }}" == "true" ] && [ "${{ github.event.pull_request.base.ref }}" == "$BASE_BRANCH" ]; then
-          mergedBranchName=$(echo "${{ github.event.pull_request.head.ref }}" | tr -d '\n')
-          git push origin --delete "$mergedBranchName"
-          echo "Merged branch '$mergedBranchName' deleted."
+        MERGED_BRANCH_NAME=$(echo "${{ github.event.pull_request.head.ref }}" | tr -d '\n')
+        if [ "${{ github.event_name }}" == "pull_request" ] && [ "${{ github.event.action }}" == "closed" ] && [ "${{ github.event.pull_request.merged }}" == "true" && "$SKIP_BRANCHES" =~ (^| )"$MERGED_BRANCH_NAME"($| ) ]]; then
+          git push origin --delete "$MERGED_BRANCH_NAME"
+          echo "Merged branch '$MERGED_BRANCH_NAME' deleted."
         else
-          echo "Not a merged pull request to the $BASE_BRANCH branch. Skipping."
+          echo "No branch to delete."
         fi
