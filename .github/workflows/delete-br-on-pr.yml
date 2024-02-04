@@ -25,5 +25,5 @@ jobs:
           git push origin --delete "$mergedBranchName"
           echo "Merged branch '$mergedBranchName' deleted."
         else
-          echo "Not a merged pull request to the main branch. Skipping."
+          echo "Not a merged pull request to the $BASE_BRANCH branch. Skipping."
         fi
